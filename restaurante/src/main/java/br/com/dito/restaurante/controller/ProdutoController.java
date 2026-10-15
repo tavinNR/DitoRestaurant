@@ -3,11 +3,11 @@ package br.com.dito.restaurante.controller;
 import br.com.dito.restaurante.DTO.ProdutoDTO;
 import br.com.dito.restaurante.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RestController
+@Controller
 @RequestMapping("/produtos")
 public class ProdutoController {
 
@@ -16,33 +16,38 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @GetMapping
-    public List<ProdutoDTO> listarTodos() {
-        return produtoService.listarTodos();
+    public String listar(Model model) {
+       model.addAttribute("produto", produtoService.listarTodos());
+       return "produto/lista";
     }
 
-    @PostMapping
-    public  ProdutoDTO criarProduto(ProdutoDTO dto) {
-        return produtoService.adicionarProduto(dto);
+    @GetMapping("/cadastrar")
+    public String novoProduto(Model model) {
+        model.addAttribute("produto", new ProdutoDTO());
+        return "produto/formCadastar";
     }
 
-    @PutMapping("/{id}")
-    public ProdutoDTO atualizarProduto( Long id, ProdutoDTO dto) {
-       return produtoService.atualizarProduto(id, dto);
+    @PostMapping("/salvar")
+    public String salvar(@ModelAttribute ProdutoDTO dto) {
+        if (dto.getId() == null) {
+            produtoService.adicionarProduto(dto);
+        } else {
+            produtoService.atualizarProduto(dto.getId(), dto);
+        }
+        return "redirect:/produtos";
     }
 
-    @DeleteMapping("/{id}")
-    public String deletarProduto(Long id) {
-        return produtoService.deletarProduto(id);
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Long id, Model model) {
+       ProdutoDTO dto = produtoService.buscarPorId(id);
+       model.addAttribute("produtos", dto);
+       return "produto/form";
     }
 
-    @GetMapping("/precos")
-    public List<ProdutoDTO> buscarPorNome(String nome) {
-        return produtoService.buscarPorNome(nome);
-    }
-
-    @GetMapping("/precos")
-    public List<ProdutoDTO> buscarProdutoEntrePrecos(Double min, Double max) {
-        return produtoService.buscarProdutoEntrePrecos(min, max);
+    @GetMapping("/excluir/{id}")
+    public String excluir(@PathVariable Long id) {
+        produtoService.deletarProduto(id);
+        return "redirect:/produtos";
     }
 
 
