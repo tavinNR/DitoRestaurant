@@ -12,6 +12,7 @@ public class ProdutoDTO {
         this.nome = nome;
         this.preco = preco;
     }
+    public ProdutoDTO() {}
 
     //Getters and Setters
     public Double getPreco() {return preco;}

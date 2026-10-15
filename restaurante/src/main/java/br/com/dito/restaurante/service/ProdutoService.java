@@ -3,12 +3,14 @@ package br.com.dito.restaurante.service;
 import br.com.dito.restaurante.model.Produto;
 import br.com.dito.restaurante.DTO.ProdutoDTO;
 import br.com.dito.restaurante.repository.ProdutoRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class ProdutoService {
 
     @Autowired
@@ -63,6 +65,12 @@ public class ProdutoService {
                 .stream()
                 .map(p -> new ProdutoDTO(p.getNome(), p.getPreco(), p.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public ProdutoDTO buscarPorId(Long id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        return new ProdutoDTO(produto.getNome(), produto.getPreco(), produto.getId());
     }
 
 }
